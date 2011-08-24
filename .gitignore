@@ -1,0 +1,31 @@
+# built application files
+bin/*.apk
+bin/*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated GUI files
+*R.java
+
+# vim backup files
+*~
+
+# proguard generated files
+proguard/*
+
+#
+sipdroid.IAB
+sipdroid.IAD
+sipdroid.IMB
+sipdroid.IMD
+sipdroid.PFI
+sipdroid.PO
+sipdroid.PR
+sipdroid.PRI
+sipdroid.PS
+sipdroid.WK3
+
