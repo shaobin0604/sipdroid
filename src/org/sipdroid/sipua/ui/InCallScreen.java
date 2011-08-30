@@ -98,6 +98,9 @@ public class InCallScreen extends CallScreen implements View.OnClickListener, Se
 	@Override
 	public void onStop() {
 		super.onStop();
+		
+		Logger.i("onStop() ----->");
+		
 		mHandler.removeMessages(MSG_BACK);
 		if (Receiver.call_state == UserAgent.UA_STATE_IDLE)
 			finish();
@@ -108,6 +111,8 @@ public class InCallScreen extends CallScreen implements View.OnClickListener, Se
 	@Override
 	public void onStart() {
 		super.onStart();
+		
+		Logger.i("onStart() ----->");
 		if (Receiver.call_state == UserAgent.UA_STATE_IDLE)
      		mHandler.sendEmptyMessageDelayed(MSG_BACK, Receiver.call_end_reason == -1?
     				2000:5000);
@@ -120,7 +125,10 @@ public class InCallScreen extends CallScreen implements View.OnClickListener, Se
 	@Override
 	public void onPause() {
 		super.onPause();
-    	if (!Sipdroid.release) Log.i("SipUA:","on pause");
+    	if (!Sipdroid.release) {
+    		Log.i("SipUA:","on pause");
+    		Logger.i("onPause() ----->");
+    	}
     	switch (Receiver.call_state) {
     	case UserAgent.UA_STATE_INCOMING_CALL:
     		if (!RtpStreamReceiver.isBluetoothAvailable()) Receiver.moveTop();
@@ -154,7 +162,10 @@ public class InCallScreen extends CallScreen implements View.OnClickListener, Se
 	@Override
 	public void onResume() {
 		super.onResume();
-    	if (!Sipdroid.release) Log.i("SipUA:","on resume");
+    	if (!Sipdroid.release) {
+    		Log.i("SipUA:","on resume");
+    		Logger.i("onResume() ----->");
+    	}
 		switch (Receiver.call_state) {
 		case UserAgent.UA_STATE_INCOMING_CALL:
 			if (Receiver.pstn_state == null || Receiver.pstn_state.equals("IDLE"))
@@ -366,6 +377,8 @@ public class InCallScreen extends CallScreen implements View.OnClickListener, Se
     @Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+		
+		Logger.i("onCreate() ----->");
 		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.incall);

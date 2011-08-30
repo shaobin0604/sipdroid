@@ -21,6 +21,7 @@
 
 package org.sipdroid.net;
 
+import org.sipdroid.sipua.ui.Logger;
 import org.zoolu.tools.Random;
 
 /**
@@ -48,9 +49,21 @@ public class RtpPacket {
 	/** Gets the RTP header length */
 	public int getHeaderLength() {
 		if (packet_len >= 12)
-			return 12 + 4 * getCscrCount();
+			return 12 + 4 * getCscrCount();	// fix header len: 12 bytes, 
 		else
 			return packet_len; // broken packet
+	}
+	
+	/**
+	 * Get the fixed 12 bytes header
+	 * 
+	 * @return the fixed 12 bytes header
+	 */
+	public String fixedHeaderToStr() {
+		return String.format("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", 
+				packet[0], packet[1], packet[2], packet[3],
+				packet[4], packet[5], packet[6], packet[7],
+				packet[8], packet[9], packet[10], packet[11]);
 	}
 
 	/** Gets the RTP header length */
@@ -305,7 +318,7 @@ public class RtpPacket {
 
 	/** Gets bit value */
 	private static boolean getBit(byte b, int bit) {
-		return (b >> bit) == 1;
+		return ((b >> bit) & 0x01) == 1;
 	}
 
 	/** Sets bit value */

@@ -26,6 +26,7 @@ import java.net.UnknownHostException;
 
 import org.sipdroid.net.KeepAliveSip;
 import org.sipdroid.sipua.ui.ChangeAccount;
+import org.sipdroid.sipua.ui.Logger;
 import org.sipdroid.sipua.ui.LoopAlarm;
 import org.sipdroid.sipua.ui.Receiver;
 import org.sipdroid.sipua.ui.Settings;
@@ -218,14 +219,17 @@ public class SipdroidEngine implements RegisterAgentListener {
 	}
 	
 	public int getRemoteVideo() {
+//		Logger.d("ua.remote_video_port = " + ua.remote_video_port);
 		return ua.remote_video_port;
 	}
 	
 	public int getLocalVideo() {
+//		Logger.d("ua.local_video_port = " + ua.local_video_port);
 		return ua.local_video_port;
 	}
 	
 	public String getRemoteAddr() {
+//		Logger.d("ua.remote_media_address = " + ua.remote_media_address);
 		return ua.remote_media_address;
 	}
 	

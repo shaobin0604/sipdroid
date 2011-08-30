@@ -1,0 +1,104 @@
+node
+----
+sip server:	192.168.10.126
+k3:			192.168.2.122
+g1:			192.168.2.112
+
+1. k3 register 
+==============
+
+1.1 k3 -----> server
+----------------
+REGISTER sip:192.168.10.126 SIP/2.0
+Via: SIP/2.0/UDP 192.168.2.122:38197;rport;branch=z9hG4bK22752
+Max-Forwards: 70
+To: <sip:101@192.168.10.126>
+From: <sip:101@192.168.10.126>;tag=z9hG4bK23926196
+Call-ID: 464346672860@192.168.2.122
+CSeq: 1 REGISTER
+Contact: <sip:101@192.168.2.122:38197;transport=udp>
+Expires: 3600
+User-Agent: Sipdroid/2.3 beta/K3 Android Refrence Design
+Content-Length: 0
+
+1.2 server -----> k3
+----------------
+SIP/2.0 407 Proxy Authentication Required
+Via: SIP/2.0/UDP 192.168.2.122:38197;received=192.168.10.250;rport=38197;branch=z9hG4bK22752
+From: <sip:101@192.168.10.126>;tag=z9hG4bK23926196
+To: <sip:101@192.168.10.126>;tag=6e5151e4
+CSeq: 1 REGISTER
+Call-ID: 464346672860@192.168.2.122
+Allow: INVITE, OPTIONS, ACK, CANCEL, BYE, REFER, SUBSCRIBE, NOTIFY, MESSAGE
+User-Agent: miniSipServer V4.0 (20 clients) build Aug 13 2011
+Proxy-Authenticate: Digest realm="myvoipapp.com",algorithm=MD5,nonce="7b444b865b8f373916582256433a0f24",stale=FALSE
+Content-Length: 0
+
+1.3 k3 -----> server
+-----------------
+REGISTER sip:192.168.10.126 SIP/2.0
+Via: SIP/2.0/UDP 192.168.2.122:38197;rport;branch=z9hG4bK77505
+Max-Forwards: 70
+To: <sip:101@192.168.10.126>
+From: <sip:101@192.168.10.126>;tag=z9hG4bK23926196
+Call-ID: 464346672860@192.168.2.122
+CSeq: 2 REGISTER
+Contact: <sip:101@192.168.2.122:38197;transport=udp>
+Expires: 3600
+User-Agent: Sipdroid/2.3 beta/K3 Android Refrence Design
+Proxy-Authorization: Digest username="101", realm="myvoipapp.com", nonce="7b444b865b8f373916582256433a0f24", uri="sip:192.168.10.126", algorithm=MD5, response="7c18a75caf42d49c1c64cac69aeb5123"
+Content-Length: 0
+
+1.4 server -----> k3
+--------------------
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 192.168.2.122:38197;received=192.168.10.250;rport=38197;branch=z9hG4bK77505
+From: <sip:101@192.168.10.126>;tag=z9hG4bK23926196
+To: <sip:101@192.168.10.126>;tag=2bd46281
+CSeq: 2 REGISTER
+Call-ID: 464346672860@192.168.2.122
+Allow: INVITE, OPTIONS, ACK, CANCEL, BYE, REFER, SUBSCRIBE, NOTIFY, MESSAGE
+User-Agent: miniSipServer V4.0 (20 clients) build Aug 13 2011
+Contact: <sip:101@192.168.2.122:45092>
+Expires: 3600
+Content-Length: 0
+
+
+2. k3 invite
+============
+2.1 k3 -----> server
+--------------------
+INVITE sip:100@192.168.10.126 SIP/2.0
+Via: SIP/2.0/UDP 192.168.2.122:38197;rport;branch=z9hG4bK80313
+Max-Forwards: 70
+To: <sip:100@192.168.10.126>
+From: <sip:101@192.168.10.126>;tag=z9hG4bK89807159
+Call-ID: 410784082060@192.168.2.122
+CSeq: 1 INVITE
+Contact: <sip:101@192.168.2.122:38197;transport=udp>
+Expires: 3600
+User-Agent: Sipdroid/2.3 beta/K3 Android Refrence Design
+Content-Length: 388
+Content-Type: application/sdp
+
+v=0																		//v=<协议版本>
+o=101@192.168.10.126 0 0 IN IP4 192.168.2.122							//o=<用户名><会话id><版本><网络类型><地址类型><地址>
+s=Session SIP/SDP														//s=<会话名>
+c=IN IP4 192.168.2.122													//c=<网络类型><地址类型><地址>
+t=0 0																	//t=<开始时间><结束时间>
+m=audio 21000 RTP/AVP 9 8 0 97 3 106 101								//m=<媒体><端口><传送><格式列表>
+a=rtpmap:9 G722/8000
+a=rtpmap:8 PCMA/8000
+a=rtpmap:0 PCMU/8000
+a=rtpmap:97 speex/8000
+a=rtpmap:3 GSM/8000
+a=rtpmap:106 BV16/8000
+a=rtpmap:101 telephone-event/8000
+a=fmtp:101 0-15
+m=video 21070 RTP/AVP 103
+a=rtpmap:103 h263-1998/90000
+
+
+
+
+video rtp type: h263-1998(103)

@@ -209,7 +209,7 @@ public class CallScreen extends Activity implements DialogInterface.OnClickListe
 		}
 	}
 
-	SipdroidSocket socket;
+//	SipdroidSocket socket;
 	RtpSocket rtp_socket;
 	Context mContext = this;
 	Intent intent;
@@ -217,51 +217,74 @@ public class CallScreen extends Activity implements DialogInterface.OnClickListe
 	@Override
 	public void onResume() {
 		super.onResume();
+		Logger.i("enter on resume...");
 		if (Integer.parseInt(Build.VERSION.SDK) >= 5 && Integer.parseInt(Build.VERSION.SDK) <= 7)
 			disableKeyguard();
-		if (Receiver.call_state == UserAgent.UA_STATE_INCALL && socket == null && Receiver.engine(mContext).getLocalVideo() != 0 && Receiver.engine(mContext).getRemoteVideo() != 0 && PreferenceManager.getDefaultSharedPreferences(this).getString(org.sipdroid.sipua.ui.Settings.PREF_SERVER, org.sipdroid.sipua.ui.Settings.DEFAULT_SERVER).equals(org.sipdroid.sipua.ui.Settings.DEFAULT_SERVER))
+		
+		Logger.d("Receiver.call_state = " + Receiver.call_state + ", rtp_socket = " + rtp_socket);
+		if (Receiver.call_state == UserAgent.UA_STATE_INCALL && rtp_socket == null && Receiver.engine(mContext).getLocalVideo() != 0 && Receiver.engine(mContext).getRemoteVideo() != 0 /*&& PreferenceManager.getDefaultSharedPreferences(this).getString(org.sipdroid.sipua.ui.Settings.PREF_SERVER, org.sipdroid.sipua.ui.Settings.DEFAULT_SERVER).equals(org.sipdroid.sipua.ui.Settings.DEFAULT_SERVER)*/)
 	        (new Thread() {
 				public void run() {
-					RtpPacket keepalive = new RtpPacket(new byte[12],0);
+					Logger.d("in new thread, intent = " + intent);
+
+					RtpPacket keepalive = new RtpPacket(new byte[12],0); // just header, no payload
 					RtpPacket videopacket = new RtpPacket(new byte[1000],0);
 					
 					try {
 						if (intent == null || rtp_socket == null) {
-							rtp_socket = new RtpSocket(socket = new SipdroidSocket(Receiver.engine(mContext).getLocalVideo()),
+							rtp_socket = new RtpSocket(/*socket = */new SipdroidSocket(Receiver.engine(mContext).getLocalVideo()),
 								InetAddress.getByName(Receiver.engine(mContext).getRemoteAddr()),
 								Receiver.engine(mContext).getRemoteVideo());
 							sleep(3000);
-						} else
-							socket = rtp_socket.getDatagramSocket();
+						} else {
+							//socket = rtp_socket.getDatagramSocket();
+						}
 						rtp_socket.getDatagramSocket().setSoTimeout(15000);
 					} catch (Exception e) {
-						if (!Sipdroid.release) e.printStackTrace();
+						if (!Sipdroid.release) {
+							e.printStackTrace();
+						}
 						return;
 					}
 					keepalive.setPayloadType(126);
 					try {
 						rtp_socket.send(keepalive);
 					} catch (Exception e1) {
+						Logger.e("Error when send keepalive", e1);
 						return;
 					}
 					for (;;) {
 						try {
+							Logger.d("video packet before receive...");
 							rtp_socket.receive(videopacket);
+							
 						} catch (IOException e) {
+							Logger.e("receive video packet error!", e);
 							rtp_socket.getDatagramSocket().disconnect();
 							try {
 								rtp_socket.send(keepalive);
 							} catch (IOException e1) {
+								
 								return;
 							}
 						}
+						
+						Logger.d("video packet payload len -> " + videopacket.getPayloadLength());
+						Logger.d("video packet header -> " + videopacket.fixedHeaderToStr());
+						
 						if (videopacket.getPayloadLength() > 200) {
+							
+							
 							if (intent != null) {
+								Logger.d("Intent != null, send message back");
+								
 								intent.putExtra("justplay",true);
 								mHandler.sendEmptyMessage(0);
 							} else {
+								Logger.d("Incoming call receive video, launch ViewCamera...");
+								
 								Intent i = new Intent(mContext, org.sipdroid.sipua.ui.VideoCamera.class);
-								i.putExtra("justplay",true);
+								i.putExtra("justplay", true);
 								startActivity(i);
 							}
 							return;
@@ -273,17 +296,27 @@ public class CallScreen extends Activity implements DialogInterface.OnClickListe
 	
     Handler mHandler = new Handler() {
     	public void handleMessage(Message msg) {
+    		Logger.i("msg.what = " + msg.what);
     		onResume();
     	}
     };
     		
     @Override
 	public void onPause() {
-		if (socket != null) {
-			socket.close();
-			socket = null;
-		}
+    	
+//		if (socket != null) {
+//			socket.close();
+//			socket = null;
+//		}
+    	
+    	if (rtp_socket != null) {
+    		rtp_socket.close();
+    		rtp_socket = null;
+    	}
 		super.onPause();
+		
+		Logger.i("onPause() ----->");
+		
 		if (Integer.parseInt(Build.VERSION.SDK) >= 5 && Integer.parseInt(Build.VERSION.SDK) <= 7)
 			reenableKeyguard();
 	}
@@ -291,6 +324,7 @@ public class CallScreen extends Activity implements DialogInterface.OnClickListe
 	@Override
 	public void onStart() {
 		super.onStart();
+		Logger.i("onStart() ----->");
 		if (Integer.parseInt(Build.VERSION.SDK) < 5 || Integer.parseInt(Build.VERSION.SDK) > 7)
 			disableKeyguard();
 	}
@@ -298,6 +332,7 @@ public class CallScreen extends Activity implements DialogInterface.OnClickListe
 	@Override
 	public void onStop() {
 		super.onStop();
+		Logger.i("onStop() ----->");
 		if (Integer.parseInt(Build.VERSION.SDK) < 5 || Integer.parseInt(Build.VERSION.SDK) > 7)
 			reenableKeyguard();
 	}
